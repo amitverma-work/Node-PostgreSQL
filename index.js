@@ -3,11 +3,11 @@ const bodyParser = require("body-parser");
 const { Pool } = require("pg");
 
 const pool = new Pool({
-  user: "your_username",
-  host: "your_host",
-  database: "your_database",
-  password: "your_password",
-  port: 5432,
+  user: process.env.username,
+  host: process.env.host,
+  database: process.env.db_name,
+  password: process.env.db_password,
+  port: process.env.port,
 });
 
 const app = express();
