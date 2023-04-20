@@ -1,16 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const { Pool } = require("pg");
-require('dotenv').config();
-
-const pool = new Pool({
-  user: process.env.APP_USERNAME,
-  host: process.env.APP_HOST,
-  database: process.env.APP_DATABASE,
-  password: process.env.APP_PASSWORD,
-  port: process.env.APP_PORT,
-});
-
+const userRoutes = require("./routes/user");
+const postRoutes = require("./routes/post");
 const app = express();
 
 // set up middleware
@@ -21,65 +12,8 @@ app.get("/", async (req, res) => {
   res.send("I'm in!!");
 });
 
-// define the routes
-app.get("/users", async (req, res) => {
-  try {
-    const client = await pool.connect();
-    const query = "SELECT * FROM users";
-    const result = await client.query(query);
-    res.json(result.rows);
-    client.release();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
-
-app.post("/users", async (req, res) => {
-  const { name, email } = req.body;
-  try {
-    const client = await pool.connect();
-    const query = "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *";
-    const values = [name, email];
-    const result = await client.query(query, values);
-    res.json(result.rows[0]);
-    client.release();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
-
-app.put("/users/:id", async (req, res) => {
-  const { id } = req.params;
-  const { email } = req.body;
-  try {
-    const client = await pool.connect();
-    const query = "UPDATE users SET email = $1 WHERE id = $2 RETURNING *";
-    const values = [email, id];
-    const result = await client.query(query, values);
-    res.json(result.rows[0]);
-    client.release();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
-
-app.delete("/users/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const client = await pool.connect();
-    const query = "DELETE FROM users WHERE id = $1 RETURNING *";
-    const values = [id];
-    const result = await client.query(query, values);
-    res.json(result.rows[0]);
-    client.release();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
+app.use("/users", userRoutes);
+app.use("/posts", postRoutes);
 
 // start the server
 const PORT = 3000;
