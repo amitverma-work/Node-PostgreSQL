@@ -1,13 +1,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
+require('dotenv').config();
 
 const pool = new Pool({
-  user: process.env.username,
-  host: process.env.host,
-  database: process.env.db_name,
-  password: process.env.db_password,
-  port: process.env.port,
+  user: process.env.APP_USERNAME,
+  host: process.env.APP_HOST,
+  database: process.env.APP_DATABASE,
+  password: process.env.APP_PASSWORD,
+  port: process.env.APP_PORT,
 });
 
 const app = express();
@@ -15,6 +16,10 @@ const app = express();
 // set up middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+app.get("/", async (req, res) => {
+  res.send("I'm in!!");
+});
 
 // define the routes
 app.get("/users", async (req, res) => {
