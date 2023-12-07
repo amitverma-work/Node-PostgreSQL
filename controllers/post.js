@@ -4,7 +4,7 @@ exports.getPost = async (req, res) => {
   try {
     const client = await db.connect();
     const query =
-      "SELECT * FROM posts INNER JOIN users ON users.id = posts.user_id";
+      "SELECT p.*, u.name FROM posts p INNER JOIN users u ON u.id = p.user_id";
     const result = await client.query(query);
     res.json(result.rows);
     client.release();
